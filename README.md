@@ -1,4 +1,4 @@
-## OSQuery-Compliance
+## GuardicoreCentra_OSquery_engine
 
 A Python CLI application that uses osquery to assess DOD STIG (Security Technical Implementation Guide) and CIS Benchmark compliance for multiple operating systems.
 
