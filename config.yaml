@@ -21,6 +21,7 @@ filters:
     state: "connected"  # Only target connected agents
     os: "linux"        # Only target Linux agents
     type: "agent"      # Only target agent endpoints
+    labels: ["production"]  # Only target agents with the 'production' label
   query_options:
     timeout: 30         # Query timeout in seconds
     limit: 1000        # Maximum number of results to return
