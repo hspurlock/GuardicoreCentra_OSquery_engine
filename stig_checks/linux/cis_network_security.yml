@@ -1,0 +1,111 @@
+---
+checks:
+  - id: "CIS-3.1.1"
+    title: "Ensure IP forwarding is disabled"
+    description: "IP forwarding must be disabled unless the system is a router to prevent the system from forwarding packets."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name = 'net.ipv4.ip_forward' AND current_value = '0';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-3.1.2"
+    title: "Ensure packet redirect sending is disabled"
+    description: "Packet redirect sending must be disabled to prevent ICMP redirect attacks."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name IN ('net.ipv4.conf.all.send_redirects', 'net.ipv4.conf.default.send_redirects') AND current_value = '0';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "2"
+
+  - id: "CIS-3.2.1"
+    title: "Ensure source routed packets are not accepted"
+    description: "Source routed packets must not be accepted to prevent source routing attacks."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name IN ('net.ipv4.conf.all.accept_source_route', 'net.ipv4.conf.default.accept_source_route') AND current_value = '0';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "2"
+
+  - id: "CIS-3.2.2"
+    title: "Ensure ICMP redirects are not accepted"
+    description: "ICMP redirects must not be accepted to prevent ICMP redirect attacks."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name IN ('net.ipv4.conf.all.accept_redirects', 'net.ipv4.conf.default.accept_redirects') AND current_value = '0';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "2"
+
+  - id: "CIS-3.2.3"
+    title: "Ensure secure ICMP redirects are not accepted"
+    description: "Secure ICMP redirects must not be accepted to prevent ICMP redirect attacks."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name IN ('net.ipv4.conf.all.secure_redirects', 'net.ipv4.conf.default.secure_redirects') AND current_value = '0';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "2"
+
+  - id: "CIS-3.2.4"
+    title: "Ensure suspicious packets are logged"
+    description: "Suspicious packets must be logged to detect potential attacks."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name IN ('net.ipv4.conf.all.log_martians', 'net.ipv4.conf.default.log_martians') AND current_value = '1';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "2"
+
+  - id: "CIS-3.2.5"
+    title: "Ensure broadcast ICMP requests are ignored"
+    description: "Broadcast ICMP requests must be ignored to prevent smurf attacks."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name = 'net.ipv4.icmp_echo_ignore_broadcasts' AND current_value = '1';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-3.2.6"
+    title: "Ensure bogus ICMP responses are ignored"
+    description: "Bogus ICMP responses must be ignored to prevent ICMP-based attacks."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name = 'net.ipv4.icmp_ignore_bogus_error_responses' AND current_value = '1';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-3.2.7"
+    title: "Ensure Reverse Path Filtering is enabled"
+    description: "Reverse Path Filtering must be enabled to prevent IP spoofing."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name IN ('net.ipv4.conf.all.rp_filter', 'net.ipv4.conf.default.rp_filter') AND current_value = '1';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "2"
+
+  - id: "CIS-3.2.8"
+    title: "Ensure TCP SYN Cookies is enabled"
+    description: "TCP SYN Cookies must be enabled to prevent SYN flood attacks."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name = 'net.ipv4.tcp_syncookies' AND current_value = '1';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-3.2.9"
+    title: "Ensure IPv6 router advertisements are not accepted"
+    description: "IPv6 router advertisements must not be accepted to prevent router advertisement attacks."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name IN ('net.ipv6.conf.all.accept_ra', 'net.ipv6.conf.default.accept_ra') AND current_value = '0';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "2"

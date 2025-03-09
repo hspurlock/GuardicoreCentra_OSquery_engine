@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "TH-MAC-NET-001"
+    title: "Detect listening on unusual ports"
+    description: "Identifies processes listening on unusual or high-numbered ports that could indicate backdoors"
+    severity: "high"
+    query: "SELECT p.name, p.path, p.cmdline, l.port, l.address, l.protocol FROM listening_ports l JOIN processes p ON l.pid = p.pid WHERE l.port > 10000 AND l.address != '127.0.0.1' AND l.protocol = 6 AND p.name NOT IN ('httpd', 'nginx', 'java', 'node', 'ruby', 'python');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-NET-002"
+    title: "Detect suspicious outbound connections"
+    description: "Identifies processes making outbound connections to suspicious ports or addresses"
+    severity: "high"
+    query: "SELECT p.name, p.path, p.cmdline, s.remote_address, s.remote_port FROM process_open_sockets s JOIN processes p ON s.pid = p.pid WHERE s.remote_port IN (22, 2222, 3389, 4444, 5555) AND s.remote_address NOT IN ('127.0.0.1', '::1', 'localhost');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-NET-003"
+    title: "Detect DNS exfiltration attempts"
+    description: "Identifies potential DNS exfiltration by detecting unusually long DNS queries"
+    severity: "high"
+    query: "SELECT count(*) FROM dns_resolvers;"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-NET-004"
+    title: "Detect suspicious ARP entries"
+    description: "Identifies suspicious ARP entries that could indicate ARP spoofing"
+    severity: "high"
+    query: "SELECT address, mac, interface FROM arp_cache WHERE mac IN (SELECT mac FROM arp_cache GROUP BY mac HAVING count(*) > 1);"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-NET-005"
+    title: "Detect promiscuous network interfaces"
+    description: "Identifies network interfaces in promiscuous mode that could be used for sniffing traffic"
+    severity: "high"
+    query: "SELECT interface, flags, type FROM interface_details WHERE flags LIKE '%PROMISC%';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "TH-MAC-NET-006"
+    title: "Detect unusual processes with network connections"
+    description: "Identifies unusual processes with network connections that could indicate command and control activity"
+    severity: "high"
+    query: "SELECT p.name, p.path, p.cmdline, s.remote_address, s.remote_port FROM process_open_sockets s JOIN processes p ON s.pid = p.pid WHERE p.name IN ('bash', 'sh', 'zsh', 'python', 'perl', 'ruby', 'osascript') AND s.remote_address NOT IN ('127.0.0.1', '::1', 'localhost');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-NET-007"
+    title: "Detect suspicious network traffic to known C2 domains"
+    description: "Identifies network connections to known command and control domains"
+    severity: "critical"
+    query: "SELECT p.name, p.path, p.cmdline, s.remote_address, s.remote_port FROM process_open_sockets s JOIN processes p ON s.pid = p.pid WHERE s.remote_address IN (SELECT address FROM dns_cache WHERE domain LIKE '%.ru' OR domain LIKE '%.cn' OR domain LIKE '%.su');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-NET-008"
+    title: "Detect port scanning activity"
+    description: "Identifies potential port scanning activity from local processes"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.cmdline, count(distinct s.remote_port) as port_count FROM processes p JOIN process_open_sockets s ON p.pid = s.pid GROUP BY p.pid HAVING port_count > 10;"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-NET-009"
+    title: "Detect unusual SSH connections"
+    description: "Identifies unusual SSH connections that could indicate unauthorized access"
+    severity: "high"
+    query: "SELECT username, time, host FROM users_logged_in WHERE username NOT IN ('root', 'admin', 'administrator') AND host NOT IN ('127.0.0.1', '::1', 'localhost');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-NET-010"
+    title: "Detect suspicious network connections from browser plugins"
+    description: "Identifies suspicious network connections from browser plugins that could indicate malicious activity"
+    severity: "medium"
+    query: "SELECT p.name, p.path, p.cmdline, s.remote_address, s.remote_port FROM process_open_sockets s JOIN processes p ON s.pid = p.pid WHERE p.path LIKE '%/Contents/MacOS/Google Chrome Helper%' OR p.path LIKE '%/Contents/MacOS/Firefox%' OR p.path LIKE '%/Contents/MacOS/Safari%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"

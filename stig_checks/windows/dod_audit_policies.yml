@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "V-225001"
+    title: "Ensure 'Audit Account Logon Events' is set to 'Success and Failure'"
+    description: "Account logon events must be audited to track authentication attempts."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Security\\Policy\\PolAdtEv' AND data LIKE '%1%%3%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-225002"
+    title: "Ensure 'Audit Account Management' is set to 'Success and Failure'"
+    description: "Account management events must be audited to track account creation, modification, and deletion."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Security\\Policy\\PolAdtEv' AND data LIKE '%4%%5%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-225003"
+    title: "Ensure 'Audit Directory Service Access' is set to 'Success and Failure'"
+    description: "Directory service access events must be audited to track access to Active Directory objects."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Security\\Policy\\PolAdtEv' AND data LIKE '%6%%7%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-225004"
+    title: "Ensure 'Audit Logon Events' is set to 'Success and Failure'"
+    description: "Logon events must be audited to track user authentication."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Security\\Policy\\PolAdtEv' AND data LIKE '%8%%9%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-225005"
+    title: "Ensure 'Audit Object Access' is set to 'Success and Failure'"
+    description: "Object access events must be audited to track access to resources."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Security\\Policy\\PolAdtEv' AND data LIKE '%10%%11%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-225006"
+    title: "Ensure 'Audit Policy Change' is set to 'Success and Failure'"
+    description: "Policy change events must be audited to track changes to security policies."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Security\\Policy\\PolAdtEv' AND data LIKE '%12%%13%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-225007"
+    title: "Ensure 'Audit Privilege Use' is set to 'Success and Failure'"
+    description: "Privilege use events must be audited to track the use of privileges."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Security\\Policy\\PolAdtEv' AND data LIKE '%14%%15%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-225008"
+    title: "Ensure 'Audit Process Tracking' is set to 'Success'"
+    description: "Process tracking events must be audited to track process creation and termination."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Security\\Policy\\PolAdtEv' AND data LIKE '%16%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-225009"
+    title: "Ensure 'Audit System Events' is set to 'Success and Failure'"
+    description: "System events must be audited to track system-level events."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Security\\Policy\\PolAdtEv' AND data LIKE '%18%%19%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-225010"
+    title: "Ensure 'Audit: Force audit policy subcategory settings' is set to 'Enabled'"
+    description: "Audit policy subcategory settings must be enforced to ensure detailed auditing."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\SCENoApplyLegacyAuditPolicy' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"

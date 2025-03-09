@@ -1,0 +1,27 @@
+centra:
+  management_server: "{management_server}"
+  api_port: 443
+  api_version: "v3.0"
+  verify_ssl: false
+  # Authentication configuration
+  auth:
+    # SSO token can be obtained from the web interface after logging in with SSO
+    # To use SSO authentication, uncomment the line below and add your token
+    # sso_token: "your-sso-token-here"
+
+# Query configuration
+query:
+  timeout: 30    # Query timeout in seconds
+  batch_size: 1000  # Number of agents to query at once
+  retry_count: 3    # Number of retries for failed queries
+
+# Agent selection criteria
+filters:
+  agent_filters:
+    state: "connected"  # Only target connected agents
+    os: "linux"        # Only target Linux agents
+    type: "agent"      # Only target agent endpoints
+  query_options:
+    timeout: 30         # Query timeout in seconds
+    limit: 1000        # Maximum number of results to return
+    include_agent_info: true  # Include agent information in results

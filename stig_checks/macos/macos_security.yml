@@ -1,0 +1,51 @@
+---
+checks:
+  - id: "V-223001"
+    title: "macOS Firewall must be enabled"
+    description: "The macOS Application Firewall must be enabled to protect the system from network-based attacks."
+    severity: "high"
+    query: "SELECT * FROM plist WHERE path = '/Library/Preferences/com.apple.alf.plist' AND key = 'globalstate' AND value > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-223002"
+    title: "System Integrity Protection must be enabled"
+    description: "System Integrity Protection (SIP) must be enabled to protect system files and processes."
+    severity: "high"
+    query: "SELECT * FROM sip_config WHERE config_flag='sip' AND enabled=1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-223003"
+    title: "FileVault disk encryption must be enabled"
+    description: "FileVault full-disk encryption must be enabled to protect data at rest."
+    severity: "high"
+    query: "SELECT * FROM disk_encryption WHERE encrypted=1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-223004"
+    title: "Automatic login must be disabled"
+    description: "Automatic login must be disabled to require authentication at system startup."
+    severity: "medium"
+    query: "SELECT * FROM plist WHERE path = '/Library/Preferences/com.apple.loginwindow.plist' AND key = 'autoLoginUser';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-223005"
+    title: "Gatekeeper must be enabled"
+    description: "Gatekeeper must be enabled to prevent execution of unauthorized applications."
+    severity: "medium"
+    query: "SELECT * FROM plist WHERE path = '/Library/Preferences/com.apple.security.plist' AND key = 'GKAutoRearm' AND value = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"

@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "V-226001"
+    title: "Ensure 'Network security: LAN Manager authentication level' is set to 'Send NTLMv2 response only. Refuse LM & NTLM'"
+    description: "LAN Manager authentication level must be configured to ensure secure authentication protocols are used."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\LmCompatibilityLevel' AND data = 5;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-226002"
+    title: "Ensure 'Network security: LDAP client signing requirements' is set to 'Negotiate signing' or higher"
+    description: "LDAP client signing requirements must be configured to ensure secure LDAP communications."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\LDAP\\LDAPClientIntegrity' AND data >= 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-226003"
+    title: "Ensure 'Network security: Minimum session security for NTLM SSP based clients' is set to 'Require NTLMv2 session security, Require 128-bit encryption'"
+    description: "Minimum session security for NTLM SSP based clients must be configured to ensure secure communications."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0\\NTLMMinClientSec' AND data = 537395200;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-226004"
+    title: "Ensure 'Network security: Minimum session security for NTLM SSP based servers' is set to 'Require NTLMv2 session security, Require 128-bit encryption'"
+    description: "Minimum session security for NTLM SSP based servers must be configured to ensure secure communications."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0\\NTLMMinServerSec' AND data = 537395200;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-226005"
+    title: "Ensure 'Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers' is set to 'Audit all' or 'Deny all'"
+    description: "Outgoing NTLM traffic to remote servers must be restricted to ensure secure communications."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0\\RestrictSendingNTLMTraffic' AND data >= 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-226006"
+    title: "Ensure 'Network security: Restrict NTLM: Audit Incoming NTLM Traffic' is set to 'Enable auditing for all accounts'"
+    description: "Incoming NTLM traffic must be audited to track potential security issues."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0\\AuditReceivingNTLMTraffic' AND data = 2;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-226007"
+    title: "Ensure 'Network security: Do not store LAN Manager hash value on next password change' is set to 'Enabled'"
+    description: "LAN Manager hash values must not be stored to prevent password disclosure."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\NoLMHash' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-226008"
+    title: "Ensure 'Network access: Do not allow anonymous enumeration of SAM accounts and shares' is set to 'Enabled'"
+    description: "Anonymous enumeration of SAM accounts and shares must be disabled to prevent information disclosure."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\RestrictAnonymous' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-226009"
+    title: "Ensure 'Network access: Let Everyone permissions apply to anonymous users' is set to 'Disabled'"
+    description: "Everyone permissions must not apply to anonymous users to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\EveryoneIncludesAnonymous' AND data = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-226010"
+    title: "Ensure 'Network access: Restrict anonymous access to Named Pipes and Shares' is set to 'Enabled'"
+    description: "Anonymous access to Named Pipes and Shares must be restricted to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters\\RestrictNullSessAccess' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"

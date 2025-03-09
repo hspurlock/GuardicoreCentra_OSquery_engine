@@ -1,0 +1,27 @@
+checks:
+  - id: "V-230222"
+    title: "Password Requirements"
+    description: "Check system password requirements in /etc/login.defs"
+    query: "SELECT * FROM file WHERE path = '/etc/login.defs' AND uid = 0 AND gid = 0 AND mode = '0644';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: 1
+
+  - id: "V-230225"
+    title: "SSH Configuration"
+    description: "Ensure SSH Protocol version 2 is used"
+    query: "SELECT * FROM file WHERE path = '/etc/ssh/sshd_config' AND uid = 0 AND gid = 0;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: 1
+
+  - id: "V-230230"
+    title: "System Audit Logs"
+    description: "Verify audit log storage size"
+    query: "SELECT * FROM augeas WHERE path = '/etc/audit/auditd.conf' AND label = 'max_log_file';"
+    condition:
+      type: "greater_than"
+      field: "value"
+      value: 5

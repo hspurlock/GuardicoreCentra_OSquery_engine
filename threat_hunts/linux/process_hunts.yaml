@@ -1,0 +1,23 @@
+hunts:
+  - id: "TH-001"
+    title: "Suspicious Process Detection"
+    description: "Detect processes running from unusual locations"
+    query: "SELECT name, path, cmdline, cwd, uid FROM processes WHERE path NOT LIKE '/usr/bin/%' AND path NOT LIKE '/usr/sbin/%' AND path NOT LIKE '/bin/%' AND path NOT LIKE '/sbin/%';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: 0
+
+  - id: "TH-002"
+    title: "Hidden Process Detection"
+    description: "Detect processes trying to hide with special characters"
+    query: "SELECT * FROM processes WHERE name LIKE '%.%' OR name LIKE ' %' OR name LIKE '% ' OR name LIKE '%  %';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: 0
+
+  - id: "TH-003"
+    title: "Network Connection Check"
+    description: "Detect unusual outbound network connections"
+    query: "SELECT DISTINCT p.name, p.path, l.port, l.address, l.protocol FROM processes p JOIN listening_ports l ON p.pid = l.pid WHERE l.address NOT IN ('127.0.0.1', '::1', '0.0.0.0', '::')"

@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "CIS-1.1.1"
+    title: "Ensure strong password hashing is used"
+    description: "Strong password hashing algorithms (SHA-512) must be used to protect password confidentiality."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/pam.d/system-auth' AND grep(pattern='password.*pam_unix.so.*sha512', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-1.1.2"
+    title: "Ensure password expiration is 365 days or less"
+    description: "Password expiration must be set to 365 days or less to ensure regular password changes."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/login.defs' AND grep(pattern='^PASS_MAX_DAYS\\s+([0-9]|[1-9][0-9]|[1-2][0-9][0-9]|3[0-5][0-9]|36[0-5])$', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-1.1.3"
+    title: "Ensure minimum password length is 14 or more characters"
+    description: "Minimum password length must be 14 or more characters to ensure strong passwords."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path IN ('/etc/security/pwquality.conf', '/etc/pam.d/system-auth') AND grep(pattern='(minlen=1[4-9]|minlen=[2-9][0-9])', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-1.1.4"
+    title: "Ensure password complexity includes at least 3 class requirements"
+    description: "Password complexity must include at least 3 character classes to ensure strong passwords."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/security/pwquality.conf' AND grep(pattern='minclass=3', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-1.1.5"
+    title: "Ensure password reuse is limited"
+    description: "Password reuse must be limited to prevent password reuse vulnerabilities."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path IN ('/etc/pam.d/system-auth', '/etc/pam.d/password-auth') AND grep(pattern='remember=[5-9]|remember=[1-9][0-9]', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-1.1.6"
+    title: "Ensure failed password attempts are limited"
+    description: "Failed password attempts must be limited to prevent brute force attacks."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path IN ('/etc/pam.d/system-auth', '/etc/pam.d/password-auth') AND grep(pattern='pam_faillock.so.*deny=[1-5]', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-1.1.7"
+    title: "Ensure accounts locked due to failed logins are not automatically unlocked"
+    description: "Accounts locked due to failed logins must not be automatically unlocked to prevent brute force attacks."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path IN ('/etc/pam.d/system-auth', '/etc/pam.d/password-auth') AND grep(pattern='pam_faillock.so.*unlock_time=(0|86400|604800|2592000)', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-1.1.8"
+    title: "Ensure password hashing algorithm is SHA-512"
+    description: "Password hashing algorithm must be SHA-512 to ensure strong password protection."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/login.defs' AND grep(pattern='^ENCRYPT_METHOD\\s+SHA512', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-1.1.9"
+    title: "Ensure PAM uses strong password requirements"
+    description: "PAM must be configured to use strong password requirements to ensure password security."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/pam.d/system-auth' AND grep(pattern='pam_pwquality.so', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-1.1.10"
+    title: "Ensure all users last password change date is in the past"
+    description: "All users' last password change date must be in the past to ensure password policies are enforced."
+    severity: "medium"
+    query: "SELECT username FROM shadow WHERE password_last_change_days > (julianday('now') - 2440587.5);"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"

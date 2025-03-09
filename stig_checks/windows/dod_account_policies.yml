@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "V-224001"
+    title: "Ensure 'Enforce password history' is set to '24 or more password(s)'"
+    description: "Password history must be configured to prevent users from reusing recent passwords."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\PasswordHistorySize' AND data >= 24;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-224002"
+    title: "Ensure 'Maximum password age' is set to '60 or fewer days, but not 0'"
+    description: "Maximum password age must be configured to ensure users change their passwords periodically."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\MaximumPasswordAge' AND data > 0 AND data <= 60;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-224003"
+    title: "Ensure 'Minimum password age' is set to '1 or more day(s)'"
+    description: "Minimum password age must be configured to prevent users from changing their passwords too frequently."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\MinimumPasswordAge' AND data >= 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-224004"
+    title: "Ensure 'Minimum password length' is set to '14 or more character(s)'"
+    description: "Minimum password length must be configured to ensure strong passwords."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\MinimumPasswordLength' AND data >= 14;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-224005"
+    title: "Ensure 'Password must meet complexity requirements' is set to 'Enabled'"
+    description: "Password complexity requirements must be enabled to ensure strong passwords."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\PasswordComplexity' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-224006"
+    title: "Ensure 'Store passwords using reversible encryption' is set to 'Disabled'"
+    description: "Storing passwords using reversible encryption must be disabled to prevent password disclosure."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\ClearTextPassword' AND data = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-224007"
+    title: "Ensure 'Account lockout duration' is set to '15 or more minute(s)'"
+    description: "Account lockout duration must be configured to prevent brute force attacks."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\LockoutDuration' AND data >= 15;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-224008"
+    title: "Ensure 'Account lockout threshold' is set to '10 or fewer invalid logon attempt(s), but not 0'"
+    description: "Account lockout threshold must be configured to prevent brute force attacks."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\LockoutBadCount' AND data > 0 AND data <= 10;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-224009"
+    title: "Ensure 'Reset account lockout counter after' is set to '15 or more minute(s)'"
+    description: "Account lockout counter reset time must be configured to prevent brute force attacks."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\ResetLockoutCount' AND data >= 15;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-224010"
+    title: "Ensure 'Interactive logon: Do not require CTRL+ALT+DEL' is set to 'Disabled'"
+    description: "Requiring CTRL+ALT+DEL for logon ensures that users are communicating with a trusted path."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DisableCAD' AND data = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"

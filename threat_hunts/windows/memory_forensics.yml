@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "TH-WIN-MEM-001"
+    title: "Detect processes with unusual parent-child relationships"
+    description: "Identifies processes with unusual parent-child relationships that could indicate process injection or masquerading"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, pp.name AS parent_name, pp.path AS parent_path FROM processes p JOIN processes pp ON p.parent = pp.pid WHERE (p.name = 'cmd.exe' AND pp.name NOT IN ('explorer.exe', 'powershell.exe', 'conhost.exe')) OR (p.name = 'powershell.exe' AND pp.name NOT IN ('explorer.exe', 'cmd.exe', 'svchost.exe'));"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-MEM-002"
+    title: "Detect processes with deleted executables"
+    description: "Identifies running processes whose executable files have been deleted"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, p.cmdline FROM processes p WHERE p.path NOT IN (SELECT path FROM file WHERE path = p.path);"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-MEM-003"
+    title: "Detect memory-resident malware"
+    description: "Identifies processes with suspicious memory-only execution patterns"
+    severity: "critical"
+    query: "SELECT p.pid, p.name, p.path, m.path AS mapped_path, m.permissions FROM processes p JOIN process_memory_map m ON p.pid = m.pid WHERE m.path = '' AND m.permissions LIKE '%rwx%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-MEM-004"
+    title: "Detect processes with excessive memory usage"
+    description: "Identifies processes with unusually high memory usage that could indicate memory dumping or crypto mining"
+    severity: "medium"
+    query: "SELECT pid, name, path, resident_size FROM processes WHERE resident_size > 1000000000 AND name NOT IN ('firefox.exe', 'chrome.exe', 'msedge.exe', 'java.exe', 'sqlservr.exe', 'MsMpEng.exe');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-MEM-005"
+    title: "Detect processes with suspicious memory mappings"
+    description: "Identifies processes with suspicious memory mappings that could indicate code injection"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, m.path AS mapped_path, m.permissions FROM processes p JOIN process_memory_map m ON p.pid = m.pid WHERE m.path LIKE '%\\Temp\\%' OR m.path LIKE '%\\AppData\\Local\\Temp\\%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-MEM-006"
+    title: "Detect processes with suspicious DLL injections"
+    description: "Identifies processes with suspicious DLL injections that could indicate malicious activity"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, m.path AS module_path FROM processes p JOIN process_memory_map m ON p.pid = m.pid WHERE m.path LIKE '%\\Temp\\%.dll' OR m.path LIKE '%\\AppData\\Local\\Temp\\%.dll';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-MEM-007"
+    title: "Detect processes with suspicious handles"
+    description: "Identifies processes with suspicious handles that could indicate process injection or credential theft"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, ph.handle_type, ph.object_name FROM processes p JOIN process_handles ph ON p.pid = ph.pid WHERE ph.handle_type = 'Process' AND p.name IN ('lsass.exe', 'csrss.exe', 'winlogon.exe');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-MEM-008"
+    title: "Detect processes with suspicious thread creation"
+    description: "Identifies processes with suspicious thread creation that could indicate code injection"
+    severity: "high"
+    query: "SELECT * FROM windows_events WHERE eventid = 4688 AND source = 'Security' AND data LIKE '%CreateRemoteThread%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-MEM-009"
+    title: "Detect processes accessing LSASS memory"
+    description: "Identifies processes accessing LSASS memory that could indicate credential theft"
+    severity: "critical"
+    query: "SELECT p.pid, p.name, p.path, ph.handle_type, ph.object_name FROM processes p JOIN process_handles ph ON p.pid = ph.pid WHERE ph.object_name LIKE '%lsass.exe%' AND p.name NOT IN ('lsass.exe', 'System', 'MsMpEng.exe');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-MEM-010"
+    title: "Detect processes with hollowed modules"
+    description: "Identifies processes with hollowed modules that could indicate process hollowing"
+    severity: "critical"
+    query: "SELECT p.pid, p.name, p.path, m.path AS module_path, m.size FROM processes p JOIN process_memory_map m ON p.pid = m.pid WHERE m.path LIKE '%.exe' AND m.size < 100000;"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"

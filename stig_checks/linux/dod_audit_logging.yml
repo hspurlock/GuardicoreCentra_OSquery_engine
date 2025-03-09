@@ -1,0 +1,121 @@
+---
+checks:
+  - id: "V-240001"
+    title: "Ensure auditd is installed and enabled"
+    description: "The audit daemon (auditd) must be installed and enabled to collect audit information."
+    severity: "high"
+    query: "SELECT * FROM services WHERE name = 'auditd' AND status = 'running';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-240002"
+    title: "Ensure audit log storage size is configured"
+    description: "Audit log storage size must be configured to ensure sufficient space for audit logs."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/auditd.conf' AND grep(pattern='max_log_file\\s*=\\s*[5-9][0-9][0-9]|max_log_file\\s*=\\s*[1-9][0-9][0-9][0-9]', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-240003"
+    title: "Ensure audit logs are not automatically deleted"
+    description: "Audit logs must not be automatically deleted to ensure audit trail preservation."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/auditd.conf' AND grep(pattern='max_log_file_action\\s*=\\s*keep_logs', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-240004"
+    title: "Ensure system is disabled when audit logs are full"
+    description: "The system must be disabled when audit logs are full to prevent unaudited actions."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/auditd.conf' AND grep(pattern='space_left_action\\s*=\\s*email|action_mail_acct\\s*=\\s*root|admin_space_left_action\\s*=\\s*halt', path) > 0;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "3"
+
+  - id: "V-240005"
+    title: "Ensure audit records for date and time changes"
+    description: "The system must collect audit records for date and time changes."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/rules.d/audit.rules' AND grep(pattern='-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-240006"
+    title: "Ensure audit records for user/group changes"
+    description: "The system must collect audit records for user and group changes."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/rules.d/audit.rules' AND grep(pattern='-w /etc/group -p wa -k identity', path) > 0 AND grep(pattern='-w /etc/passwd -p wa -k identity', path) > 0;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "1"
+
+  - id: "V-240007"
+    title: "Ensure audit records for network configuration changes"
+    description: "The system must collect audit records for network configuration changes."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/rules.d/audit.rules' AND grep(pattern='-a always,exit -F arch=b64 -S sethostname -S setdomainname -k system-locale', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-240008"
+    title: "Ensure audit records for discretionary access control changes"
+    description: "The system must collect audit records for discretionary access control changes (chmod, chown, etc.)."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/rules.d/audit.rules' AND grep(pattern='-a always,exit -F arch=b64 -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-240009"
+    title: "Ensure audit records for unsuccessful unauthorized access attempts"
+    description: "The system must collect audit records for unsuccessful unauthorized access attempts to files."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/rules.d/audit.rules' AND grep(pattern='-a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-240010"
+    title: "Ensure audit records for use of privileged commands"
+    description: "The system must collect audit records for the use of privileged commands."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/rules.d/audit.rules' AND grep(pattern='-a always,exit -F path=/usr/bin/sudo -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-240011"
+    title: "Ensure audit records for successful file system mounts"
+    description: "The system must collect audit records for successful file system mounts."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/rules.d/audit.rules' AND grep(pattern='-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=4294967295 -k mounts', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-240012"
+    title: "Ensure audit records for file deletion events"
+    description: "The system must collect audit records for file deletion events by users."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/audit/rules.d/audit.rules' AND grep(pattern='-a always,exit -F arch=b64 -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=4294967295 -k delete', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"

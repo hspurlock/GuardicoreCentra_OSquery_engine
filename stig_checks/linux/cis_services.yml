@@ -1,0 +1,141 @@
+---
+checks:
+  - id: "CIS-2.1.1"
+    title: "Ensure xinetd is not installed"
+    description: "The xinetd service must not be installed as it can be used to enable unnecessary network services."
+    severity: "medium"
+    query: "SELECT * FROM rpm_packages WHERE name = 'xinetd';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.1.2"
+    title: "Ensure openbsd-inetd is not installed"
+    description: "The openbsd-inetd service must not be installed as it can be used to enable unnecessary network services."
+    severity: "medium"
+    query: "SELECT * FROM deb_packages WHERE name = 'openbsd-inetd';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.1"
+    title: "Ensure NIS Client is not installed"
+    description: "The NIS client must not be installed as it has serious security issues."
+    severity: "high"
+    query: "SELECT * FROM rpm_packages WHERE name IN ('ypbind', 'nis');"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.2"
+    title: "Ensure rsh client is not installed"
+    description: "The rsh client must not be installed as it uses insecure protocols."
+    severity: "high"
+    query: "SELECT * FROM rpm_packages WHERE name = 'rsh';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.3"
+    title: "Ensure talk client is not installed"
+    description: "The talk client must not be installed as it uses insecure protocols."
+    severity: "medium"
+    query: "SELECT * FROM rpm_packages WHERE name = 'talk';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.4"
+    title: "Ensure telnet client is not installed"
+    description: "The telnet client must not be installed as it uses insecure protocols."
+    severity: "high"
+    query: "SELECT * FROM rpm_packages WHERE name = 'telnet';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.5"
+    title: "Ensure LDAP client is not installed"
+    description: "The LDAP client must not be installed unless specifically required."
+    severity: "medium"
+    query: "SELECT * FROM rpm_packages WHERE name = 'openldap-clients';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.6"
+    title: "Ensure TFTP server is not installed"
+    description: "The TFTP server must not be installed unless specifically required."
+    severity: "medium"
+    query: "SELECT * FROM rpm_packages WHERE name = 'tftp-server';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.7"
+    title: "Ensure FTP server is not installed"
+    description: "The FTP server must not be installed as it uses insecure protocols."
+    severity: "high"
+    query: "SELECT * FROM rpm_packages WHERE name IN ('vsftpd', 'ftpd', 'proftpd');"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.8"
+    title: "Ensure HTTP server is not installed"
+    description: "The HTTP server must not be installed unless specifically required."
+    severity: "medium"
+    query: "SELECT * FROM rpm_packages WHERE name IN ('httpd', 'apache2', 'nginx');"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.9"
+    title: "Ensure IMAP and POP3 server is not installed"
+    description: "The IMAP and POP3 server must not be installed unless specifically required."
+    severity: "medium"
+    query: "SELECT * FROM rpm_packages WHERE name IN ('dovecot', 'cyrus-imapd');"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.10"
+    title: "Ensure Samba is not installed"
+    description: "The Samba server must not be installed unless specifically required."
+    severity: "medium"
+    query: "SELECT * FROM rpm_packages WHERE name = 'samba';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.11"
+    title: "Ensure SNMP Server is not installed"
+    description: "The SNMP server must not be installed unless specifically required."
+    severity: "medium"
+    query: "SELECT * FROM rpm_packages WHERE name = 'net-snmp';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-2.2.12"
+    title: "Ensure NIS Server is not installed"
+    description: "The NIS server must not be installed as it has serious security issues."
+    severity: "high"
+    query: "SELECT * FROM rpm_packages WHERE name = 'ypserv';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"

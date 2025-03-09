@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "CIS-W-1.1.1"
+    title: "Ensure 'Enforce password history' is set to '24 or more password(s)'"
+    description: "Password history must be configured to prevent users from reusing recent passwords."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\PasswordHistorySize' AND data >= 24;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-1.1.2"
+    title: "Ensure 'Account lockout threshold' is set to '5 or fewer invalid logon attempt(s), but not 0'"
+    description: "Account lockout threshold must be configured to prevent brute force attacks."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\LockoutBadCount' AND data > 0 AND data <= 5;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-2.2.1"
+    title: "Ensure 'Access Credential Manager as a trusted caller' is set to 'No One'"
+    description: "This security setting is used by Credential Manager during backup and restore."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\SeTrustedCredManAccessPrivilege' AND data = '';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-2.2.2"
+    title: "Ensure 'Access this computer from the network' is set to 'Administrators, Remote Desktop Users'"
+    description: "This policy setting allows other users on the network to connect to the computer and is required by various network protocols."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\SeNetworkLogonRight' AND (data LIKE '%Administrators%' AND data LIKE '%Remote Desktop Users%');"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-2.3.1"
+    title: "Ensure 'Accounts: Administrator account status' is set to 'Disabled'"
+    description: "The built-in Administrator account should be disabled to prevent it from being targeted in attacks."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\EnableAdminAccount' AND data = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-2.3.2"
+    title: "Ensure 'Accounts: Guest account status' is set to 'Disabled'"
+    description: "The built-in Guest account should be disabled to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\EnableGuestAccount' AND data = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-2.3.7"
+    title: "Ensure 'Interactive logon: Do not display last user name' is set to 'Enabled'"
+    description: "This policy setting determines whether the account name of the last user to log on to the computer is displayed in the Windows logon screen."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DontDisplayLastUserName' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-2.3.8"
+    title: "Ensure 'Interactive logon: Do not require CTRL+ALT+DEL' is set to 'Disabled'"
+    description: "This policy setting determines whether users must press CTRL+ALT+DEL before they log on."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DisableCAD' AND data = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-2.3.9"
+    title: "Ensure 'Interactive logon: Machine inactivity limit' is set to '900 or fewer second(s), but not 0'"
+    description: "This policy setting determines the amount of idle time that must pass before the screen saver is enforced."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\InactivityTimeoutSecs' AND data > 0 AND data <= 900;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-2.3.10"
+    title: "Ensure 'Interactive logon: Message text for users attempting to log on' is configured"
+    description: "This policy setting specifies a text message that displays to users when they log on."
+    severity: "low"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\LegalNoticeText' AND data != '';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"

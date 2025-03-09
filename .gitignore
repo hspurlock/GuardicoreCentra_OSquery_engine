@@ -1,0 +1,46 @@
+# Python virtual environments
+venv/
+env/
+ENV/
+.env/
+.venv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Environment variables and secrets
+.env
+*.env
+
+# Report outputs
+reports/
+*.html
+*.pdf
+*.csv
+*.xlsx
+
+# Temporary files
+*.tmp
+.coverage
+htmlcov/
+
+# Local configuration
+config.local.yml

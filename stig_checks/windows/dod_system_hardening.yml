@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "V-227001"
+    title: "Ensure 'User Account Control: Admin Approval Mode for the Built-in Administrator account' is set to 'Enabled'"
+    description: "Admin Approval Mode for the Built-in Administrator account must be enabled to ensure secure administrative operations."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\FilterAdministratorToken' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-227002"
+    title: "Ensure 'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' is set to 'Prompt for consent on the secure desktop'"
+    description: "The elevation prompt for administrators must be configured to ensure secure administrative operations."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\ConsentPromptBehaviorAdmin' AND data = 2;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-227003"
+    title: "Ensure 'User Account Control: Run all administrators in Admin Approval Mode' is set to 'Enabled'"
+    description: "Admin Approval Mode for all administrators must be enabled to ensure secure administrative operations."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\EnableLUA' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-227004"
+    title: "Ensure 'System objects: Require case insensitivity for non-Windows subsystems' is set to 'Enabled'"
+    description: "Case insensitivity for non-Windows subsystems must be required to ensure consistent security enforcement."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\Kernel\\ObCaseInsensitive' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-227005"
+    title: "Ensure 'System objects: Strengthen default permissions of internal system objects' is set to 'Enabled'"
+    description: "Default permissions of internal system objects must be strengthened to ensure secure system operations."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\ProtectionMode' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-227006"
+    title: "Ensure 'System settings: Optional subsystems' is set to 'Defined: (blank)'"
+    description: "Optional subsystems must be restricted to ensure secure system operations."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\SubSystems\\Optional' AND data = '';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-227007"
+    title: "Ensure 'System cryptography: Use FIPS compliant algorithms for encryption, hashing, and signing' is set to 'Enabled'"
+    description: "FIPS compliant algorithms must be used for encryption, hashing, and signing to ensure secure cryptographic operations."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\FIPSAlgorithmPolicy\\Enabled' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-227008"
+    title: "Ensure 'Windows Defender Antivirus' is set to 'Enabled'"
+    description: "Windows Defender Antivirus must be enabled to protect against malware."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows Defender\\DisableAntiSpyware' AND data = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-227009"
+    title: "Ensure 'Turn off Data Execution Prevention for Explorer' is set to 'Disabled'"
+    description: "Data Execution Prevention for Explorer must be enabled to prevent the execution of malicious code."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\Explorer\\NoDataExecutionPrevention' AND data = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-227010"
+    title: "Ensure 'Turn off heap termination on corruption' is set to 'Disabled'"
+    description: "Heap termination on corruption must be enabled to prevent the exploitation of memory corruption vulnerabilities."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\Explorer\\NoHeapTerminationOnCorruption' AND data = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"

@@ -1,0 +1,151 @@
+---
+checks:
+  - id: "V-250001"
+    title: "Ensure GRUB bootloader password is set"
+    description: "GRUB bootloader must have a password set to prevent unauthorized system modifications during boot."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path IN ('/boot/grub2/grub.cfg', '/boot/grub/grub.cfg') AND grep(pattern='password|password_pbkdf2', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250002"
+    title: "Ensure all setuid executables are authorized"
+    description: "All setuid executables must be authorized to prevent privilege escalation."
+    severity: "high"
+    query: "SELECT path FROM file WHERE type = 'regular' AND (mode & 04000) > 0 AND path NOT IN ('/usr/bin/sudo', '/usr/bin/passwd', '/usr/bin/su', '/usr/bin/mount', '/usr/bin/umount', '/usr/bin/chage', '/usr/bin/gpasswd', '/usr/bin/newgrp');"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250003"
+    title: "Ensure all setgid executables are authorized"
+    description: "All setgid executables must be authorized to prevent privilege escalation."
+    severity: "high"
+    query: "SELECT path FROM file WHERE type = 'regular' AND (mode & 02000) > 0 AND path NOT IN ('/usr/bin/write', '/usr/bin/wall', '/usr/bin/ssh-agent', '/usr/bin/crontab', '/usr/bin/chage', '/usr/bin/expiry');"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250004"
+    title: "Ensure password fields are not empty"
+    description: "No accounts must have empty password fields to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT username FROM shadow WHERE password = '';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250005"
+    title: "Ensure no duplicate UIDs exist"
+    description: "No duplicate UIDs must exist to prevent security issues."
+    severity: "high"
+    query: "SELECT uid, COUNT(uid) AS count FROM users GROUP BY uid HAVING count > 1;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250006"
+    title: "Ensure no duplicate GIDs exist"
+    description: "No duplicate GIDs must exist to prevent security issues."
+    severity: "medium"
+    query: "SELECT gid, COUNT(gid) AS count FROM groups GROUP BY gid HAVING count > 1;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250007"
+    title: "Ensure no duplicate user names exist"
+    description: "No duplicate user names must exist to prevent security issues."
+    severity: "high"
+    query: "SELECT username, COUNT(username) AS count FROM users GROUP BY username HAVING count > 1;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250008"
+    title: "Ensure no duplicate group names exist"
+    description: "No duplicate group names must exist to prevent security issues."
+    severity: "medium"
+    query: "SELECT groupname, COUNT(groupname) AS count FROM groups GROUP BY groupname HAVING count > 1;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250009"
+    title: "Ensure shadow group is empty"
+    description: "The shadow group must be empty to prevent unauthorized access to password hashes."
+    severity: "high"
+    query: "SELECT * FROM user_groups WHERE groupname = 'shadow';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250010"
+    title: "Ensure all users' home directories exist"
+    description: "All users must have a home directory to prevent security issues."
+    severity: "medium"
+    query: "SELECT username, directory FROM users u LEFT JOIN file f ON u.directory = f.path WHERE u.directory != '/' AND u.directory NOT IN ('/var/run', '/var/run/nobody', '/dev/null') AND (f.path IS NULL OR f.directory = 0);"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250011"
+    title: "Ensure users own their home directories"
+    description: "Users must own their home directories to prevent unauthorized access."
+    severity: "medium"
+    query: "SELECT u.username, u.directory, f.uid FROM users u JOIN file f ON u.directory = f.path WHERE u.uid != f.uid AND u.directory != '/' AND u.directory NOT IN ('/var/run', '/var/run/nobody', '/dev/null');"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250012"
+    title: "Ensure users' home directories permissions are 750 or more restrictive"
+    description: "Users' home directories must have permissions of 750 or more restrictive to prevent unauthorized access."
+    severity: "medium"
+    query: "SELECT u.username, u.directory, f.mode FROM users u JOIN file f ON u.directory = f.path WHERE (f.mode & 0027) > 0 AND u.directory != '/' AND u.directory NOT IN ('/var/run', '/var/run/nobody', '/dev/null');"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250013"
+    title: "Ensure users' dot files are not group or world writable"
+    description: "Users' dot files must not be group or world writable to prevent unauthorized access."
+    severity: "medium"
+    query: "SELECT path FROM file WHERE path LIKE '/home/%/.%' AND (mode & 0022) > 0;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250014"
+    title: "Ensure no users have .forward files"
+    description: "No users must have .forward files to prevent mail spoofing."
+    severity: "medium"
+    query: "SELECT path FROM file WHERE path LIKE '/home/%/.forward';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-250015"
+    title: "Ensure no users have .netrc files"
+    description: "No users must have .netrc files to prevent clear text credential storage."
+    severity: "high"
+    query: "SELECT path FROM file WHERE path LIKE '/home/%/.netrc';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"

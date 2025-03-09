@@ -1,0 +1,61 @@
+---
+checks:
+  - id: "V-220901"
+    title: "Root account must be secured"
+    description: "The root account must be properly secured to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT username, uid, gid, shell FROM users WHERE username='root' AND uid=0 AND gid=0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-220902"
+    title: "System must not have duplicate UIDs"
+    description: "Duplicate UIDs allow users to access files and directories of another user."
+    severity: "high"
+    query: "SELECT uid, count(uid) AS count FROM users GROUP BY uid HAVING count > 1;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-220903"
+    title: "System must not have duplicate GIDs"
+    description: "Duplicate GIDs allow groups to access files and directories of another group."
+    severity: "medium"
+    query: "SELECT gid, count(gid) AS count FROM groups GROUP BY gid HAVING count > 1;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-220904"
+    title: "System must not have accounts with UID 0 other than root"
+    description: "Only the root account should have UID 0, which grants full system privileges."
+    severity: "high"
+    query: "SELECT username, uid FROM users WHERE uid=0 AND username!='root';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+      
+  - id: "V-220905"
+    title: "User home directories must exist"
+    description: "All users with a shell must have a home directory assigned to ensure proper security context."
+    severity: "medium"
+    query: "SELECT username, directory FROM users WHERE shell NOT IN ('/sbin/nologin', '/bin/false', '/usr/bin/false', '/usr/sbin/nologin') AND directory='';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+      
+  - id: "V-220906"
+    title: "Default system accounts must be disabled"
+    description: "Default system accounts must be disabled or locked to prevent unauthorized access."
+    severity: "medium"
+    query: "SELECT username, shell FROM users WHERE username IN ('games', 'gopher', 'ftp', 'shutdown', 'halt', 'news', 'uucp', 'operator', 'lp') AND shell NOT IN ('/sbin/nologin', '/bin/false', '/usr/bin/false', '/usr/sbin/nologin');"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"

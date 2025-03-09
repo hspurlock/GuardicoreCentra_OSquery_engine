@@ -1,0 +1,51 @@
+---
+checks:
+  - id: "V-221001"
+    title: "World-writable files must not exist"
+    description: "Files with world-writable permissions present a security risk as they can be modified by any user."
+    severity: "high"
+    query: "SELECT path, mode FROM file WHERE path NOT LIKE '/proc/%' AND path NOT LIKE '/sys/%' AND path NOT LIKE '/dev/%' AND path NOT LIKE '/run/%' AND directory = 0 AND mode & 2 LIMIT 10;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-221002"
+    title: "SUID and SGID executables must be properly restricted"
+    description: "SUID and SGID executables allow users to execute programs with elevated privileges."
+    severity: "high"
+    query: "SELECT path, mode FROM file WHERE path NOT LIKE '/proc/%' AND path NOT LIKE '/sys/%' AND path NOT LIKE '/dev/%' AND path NOT LIKE '/run/%' AND ((mode & 2048) OR (mode & 1024)) AND path NOT IN ('/usr/bin/sudo', '/usr/bin/passwd', '/usr/bin/gpasswd', '/usr/bin/newgrp', '/usr/bin/chsh', '/usr/bin/chfn', '/usr/bin/su', '/bin/mount', '/bin/umount') LIMIT 10;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-221003"
+    title: "System must use a separate filesystem for /tmp"
+    description: "The system must use a separate filesystem for /tmp to prevent executable programs in /tmp from having the ability to consume all available disk space."
+    severity: "medium"
+    query: "SELECT device, path, type FROM mounts WHERE path = '/tmp';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-221004"
+    title: "Home directories must have restrictive permissions"
+    description: "Home directories must have permissions of 750 or more restrictive to prevent unauthorized access."
+    severity: "medium"
+    query: "SELECT path, mode FROM file WHERE path LIKE '/home/%' AND directory = 1 AND (mode & 2) LIMIT 10;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+      
+  - id: "V-221005"
+    title: "Critical system files must have proper ownership"
+    description: "Critical system files must be owned by root to prevent unauthorized modification."
+    severity: "high"
+    query: "SELECT path, uid, gid FROM file WHERE path IN ('/etc/passwd', '/etc/shadow', '/etc/group', '/etc/gshadow', '/etc/ssh/sshd_config') AND uid != 0;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"

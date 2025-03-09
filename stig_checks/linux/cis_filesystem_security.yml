@@ -1,0 +1,131 @@
+---
+checks:
+  - id: "CIS-4.1.1"
+    title: "Ensure sticky bit is set on all world-writable directories"
+    description: "The sticky bit must be set on all world-writable directories to prevent users from deleting or renaming files in that directory that are not owned by them."
+    severity: "medium"
+    query: "SELECT path FROM file WHERE directory = 1 AND (mode & 0002) > 0 AND (mode & 01000) = 0;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.2"
+    title: "Ensure default user umask is 027 or more restrictive"
+    description: "The default user umask must be set to 027 or more restrictive to ensure proper file permissions."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path IN ('/etc/bashrc', '/etc/profile') AND grep(pattern='umask\\s+0[2-7][7]', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.3"
+    title: "Ensure no legacy '+' entries exist in /etc/passwd"
+    description: "No legacy '+' entries must exist in /etc/passwd to prevent NIS attacks."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/passwd' AND grep(pattern='^\\+:', path) > 0;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.4"
+    title: "Ensure no legacy '+' entries exist in /etc/shadow"
+    description: "No legacy '+' entries must exist in /etc/shadow to prevent NIS attacks."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/shadow' AND grep(pattern='^\\+:', path) > 0;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.5"
+    title: "Ensure no legacy '+' entries exist in /etc/group"
+    description: "No legacy '+' entries must exist in /etc/group to prevent NIS attacks."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/group' AND grep(pattern='^\\+:', path) > 0;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.6"
+    title: "Ensure root is the only UID 0 account"
+    description: "Root must be the only UID 0 account to prevent privilege escalation."
+    severity: "high"
+    query: "SELECT * FROM users WHERE uid = 0 AND username != 'root';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.7"
+    title: "Ensure permissions on /etc/passwd are configured"
+    description: "Permissions on /etc/passwd must be configured to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/passwd' AND mode = '0644';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.8"
+    title: "Ensure permissions on /etc/shadow are configured"
+    description: "Permissions on /etc/shadow must be configured to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/shadow' AND mode = '0000';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.9"
+    title: "Ensure permissions on /etc/group are configured"
+    description: "Permissions on /etc/group must be configured to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/group' AND mode = '0644';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.10"
+    title: "Ensure permissions on /etc/gshadow are configured"
+    description: "Permissions on /etc/gshadow must be configured to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/gshadow' AND mode = '0000';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.11"
+    title: "Ensure no world writable files exist"
+    description: "No world writable files must exist to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT path FROM file WHERE type = 'regular' AND (mode & 0002) > 0 AND path NOT LIKE '/proc/%' AND path NOT LIKE '/sys/%';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.12"
+    title: "Ensure no unowned files or directories exist"
+    description: "No unowned files or directories must exist to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT path FROM file WHERE uid = -1 AND path NOT LIKE '/proc/%' AND path NOT LIKE '/sys/%';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-4.1.13"
+    title: "Ensure no ungrouped files or directories exist"
+    description: "No ungrouped files or directories must exist to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT path FROM file WHERE gid = -1 AND path NOT LIKE '/proc/%' AND path NOT LIKE '/sys/%';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"

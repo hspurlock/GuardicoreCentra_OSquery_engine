@@ -1,0 +1,51 @@
+---
+checks:
+  - id: "V-222001"
+    title: "Windows Firewall must be enabled"
+    description: "Windows Firewall must be enabled to protect the system from network-based attacks."
+    severity: "high"
+    query: "SELECT name FROM services WHERE name = 'MpsSvc' AND start_type = 'AUTO_START' AND status = 'RUNNING';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-222002"
+    title: "Windows must use strong password policies"
+    description: "Windows must enforce password complexity requirements."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\PasswordComplexity' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-222003"
+    title: "Remote Desktop Services must be properly configured"
+    description: "Remote Desktop Services must be properly configured to ensure secure remote access."
+    severity: "medium"
+    query: "SELECT name FROM services WHERE name = 'TermService' AND status = 'RUNNING';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-222004"
+    title: "Windows Defender must be enabled"
+    description: "Windows Defender antivirus must be enabled to protect against malware."
+    severity: "high"
+    query: "SELECT name FROM services WHERE name = 'WinDefend' AND status = 'RUNNING';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-222005"
+    title: "Windows must have automatic updates enabled"
+    description: "Windows must have automatic updates enabled to ensure security patches are applied."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update\\AUOptions' AND data >= 3;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"

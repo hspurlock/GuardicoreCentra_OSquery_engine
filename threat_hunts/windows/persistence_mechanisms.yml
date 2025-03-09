@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "TH-WIN-001"
+    title: "Detect suspicious registry autorun keys"
+    description: "Identifies potentially malicious autorun registry keys that could be used for persistence"
+    severity: "high"
+    query: "SELECT path, name, data, key FROM registry WHERE path LIKE 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run%' OR path LIKE 'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-002"
+    title: "Detect suspicious scheduled tasks"
+    description: "Identifies potentially malicious scheduled tasks that could be used for persistence"
+    severity: "high"
+    query: "SELECT name, action, path, enabled, hidden FROM scheduled_tasks WHERE hidden = 1 OR action LIKE '%powershell%' OR action LIKE '%cmd%' OR action LIKE '%wscript%' OR action LIKE '%cscript%' OR action LIKE '%regsvr32%' OR action LIKE '%rundll32%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-003"
+    title: "Detect suspicious WMI event subscriptions"
+    description: "Identifies potentially malicious WMI event subscriptions that could be used for persistence"
+    severity: "high"
+    query: "SELECT name, query, command, username FROM wmi_event_filters JOIN wmi_filter_consumer_binding USING (name) JOIN wmi_script_event_consumers USING (consumer);"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-004"
+    title: "Detect suspicious services"
+    description: "Identifies potentially malicious services that could be used for persistence"
+    severity: "high"
+    query: "SELECT name, path, service_type, start_type, status, user_account FROM services WHERE path LIKE '%powershell%' OR path LIKE '%cmd%' OR path LIKE '%wscript%' OR path LIKE '%cscript%' OR path LIKE '%regsvr32%' OR path LIKE '%rundll32%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-005"
+    title: "Detect suspicious startup items"
+    description: "Identifies potentially malicious startup items that could be used for persistence"
+    severity: "high"
+    query: "SELECT name, path, args, type FROM startup_items WHERE path LIKE '%powershell%' OR path LIKE '%cmd%' OR path LIKE '%wscript%' OR path LIKE '%cscript%' OR path LIKE '%regsvr32%' OR path LIKE '%rundll32%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-006"
+    title: "Detect suspicious DLL search order hijacking"
+    description: "Identifies potential DLL search order hijacking in system directories"
+    severity: "high"
+    query: "SELECT path, filename FROM file WHERE path LIKE 'C:\\Windows\\System32\\%' AND filename LIKE '%.dll' AND filename NOT IN (SELECT DISTINCT(filename) FROM file WHERE path LIKE 'C:\\Windows\\System32\\%' AND filename LIKE '%.dll');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-007"
+    title: "Detect suspicious processes"
+    description: "Identifies potentially malicious processes with suspicious command lines"
+    severity: "high"
+    query: "SELECT name, path, cmdline, parent, parent_path FROM processes WHERE cmdline LIKE '%powershell%encode%' OR cmdline LIKE '%powershell% -e %' OR cmdline LIKE '%powershell% -enc %' OR cmdline LIKE '%powershell% -nop %' OR cmdline LIKE '%powershell% -w hidden%' OR cmdline LIKE '%cmd% /c %' OR cmdline LIKE '%wscript%/e:%' OR cmdline LIKE '%cscript%/e:%';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "TH-WIN-008"
+    title: "Detect suspicious network connections"
+    description: "Identifies potentially malicious network connections to unusual ports or addresses"
+    severity: "high"
+    query: "SELECT p.name, p.path, p.cmdline, s.local_address, s.local_port, s.remote_address, s.remote_port, s.state FROM process_open_sockets s JOIN processes p ON s.pid = p.pid WHERE (s.remote_port = 4444 OR s.remote_port = 4545 OR s.remote_port = 1337 OR s.remote_port = 31337 OR s.remote_port = 666 OR s.remote_port = 6666 OR s.remote_port = 6667 OR s.remote_port = 6668 OR s.remote_port = 6669 OR s.remote_port = 9999) AND s.state = 'ESTABLISHED';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "TH-WIN-009"
+    title: "Detect unsigned DLLs in system directories"
+    description: "Identifies unsigned DLLs in system directories that could be malicious"
+    severity: "medium"
+    query: "SELECT path, filename, signed FROM authenticode WHERE path LIKE 'C:\\Windows\\System32\\%' AND filename LIKE '%.dll' AND signed = 0;"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-WIN-010"
+    title: "Detect suspicious registry modifications for credential access"
+    description: "Identifies registry modifications that could be used for credential access"
+    severity: "high"
+    query: "SELECT path, name, data FROM registry WHERE path LIKE 'HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest\\UseLogonCredential' AND data = 1;"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"

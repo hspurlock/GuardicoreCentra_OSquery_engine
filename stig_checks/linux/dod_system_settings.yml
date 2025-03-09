@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "V-230001"
+    title: "Ensure SELinux or AppArmor is enabled"
+    description: "Security-Enhanced Linux (SELinux) or AppArmor must be enabled to provide mandatory access controls."
+    severity: "high"
+    query: "SELECT * FROM kernel_modules WHERE name IN ('selinux', 'apparmor');"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-230002"
+    title: "Ensure core dumps are restricted"
+    description: "Core dumps must be restricted to prevent sensitive information disclosure."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name = 'fs.suid_dumpable' AND current_value = '0';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-230003"
+    title: "Ensure address space layout randomization (ASLR) is enabled"
+    description: "Address space layout randomization (ASLR) must be enabled to protect against memory-based attacks."
+    severity: "medium"
+    query: "SELECT * FROM sysctl WHERE name = 'kernel.randomize_va_space' AND current_value = '2';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-230004"
+    title: "Ensure prelink is disabled"
+    description: "The prelinking of binaries must be disabled to prevent potential security bypasses."
+    severity: "medium"
+    query: "SELECT * FROM rpm_packages WHERE name = 'prelink';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-230005"
+    title: "Ensure system-wide crypto policy is not legacy"
+    description: "System-wide crypto policy must not be set to legacy to ensure strong cryptographic algorithms."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path = '/etc/crypto-policies/config' AND directory = 0 AND grep(pattern='LEGACY', path) = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-230006"
+    title: "Ensure AIDE is installed"
+    description: "Advanced Intrusion Detection Environment (AIDE) must be installed to detect unauthorized changes to files."
+    severity: "medium"
+    query: "SELECT * FROM rpm_packages WHERE name = 'aide';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-230007"
+    title: "Ensure filesystem integrity is regularly checked"
+    description: "Filesystem integrity must be regularly checked to detect unauthorized changes."
+    severity: "medium"
+    query: "SELECT * FROM crontab WHERE command LIKE '%aide%' OR command LIKE '%tripwire%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-230008"
+    title: "Ensure permissions on bootloader config are configured"
+    description: "Bootloader configuration files must have proper permissions to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path IN ('/boot/grub2/grub.cfg', '/boot/grub/grub.cfg', '/boot/efi/EFI/redhat/grub.cfg') AND (mode & 0027) = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-230009"
+    title: "Ensure authentication required for single user mode"
+    description: "Authentication must be required for single user mode to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT * FROM file WHERE path IN ('/usr/lib/systemd/system/rescue.service', '/usr/lib/systemd/system/emergency.service') AND grep(pattern='ExecStart=.*sulogin', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-230010"
+    title: "Ensure interactive boot is disabled"
+    description: "Interactive boot must be disabled to prevent unauthorized changes during boot."
+    severity: "medium"
+    query: "SELECT * FROM file WHERE path = '/etc/sysconfig/init' AND grep(pattern='^PROMPT=no', path) > 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"

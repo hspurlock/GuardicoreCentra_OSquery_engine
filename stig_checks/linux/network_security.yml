@@ -1,0 +1,61 @@
+---
+checks:
+  - id: "V-221101"
+    title: "Firewall must be enabled"
+    description: "A host-based firewall must be enabled to protect the system from network-based attacks."
+    severity: "high"
+    query: "SELECT name FROM processes WHERE name IN ('firewalld', 'ufw', 'iptables', 'nftables') OR cmdline LIKE '%firewall%' OR cmdline LIKE '%iptables%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-221102"
+    title: "SSH server must be configured securely"
+    description: "SSH server must be configured with secure settings to prevent unauthorized access."
+    severity: "high"
+    query: "SELECT name FROM processes WHERE name = 'sshd';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-221103"
+    title: "Telnet server must not be running"
+    description: "Telnet is an insecure protocol and must not be running on the system."
+    severity: "high"
+    query: "SELECT process.name FROM processes AS process WHERE process.name = 'telnetd' OR process.name = 'inetd' OR process.name = 'xinetd';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-221104"
+    title: "Unnecessary network services must be disabled"
+    description: "Unnecessary network services must be disabled to reduce the attack surface."
+    severity: "medium"
+    query: "SELECT port, protocol FROM listening_ports WHERE port IN (21, 23, 25, 69, 79, 111, 2049, 3306, 5432) AND protocol = 'tcp';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "V-221105"
+    title: "System must not have unnecessary network interfaces enabled"
+    description: "Unnecessary network interfaces should be disabled to reduce the attack surface."
+    severity: "medium"
+    query: "SELECT count(*) AS count FROM interface_details WHERE interface NOT IN ('lo', 'eth0', 'ens33', 'wlan0', 'docker0') AND flags LIKE '%UP%';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+      
+  - id: "V-221106"
+    title: "System must not have unnecessary listening ports"
+    description: "The system should not have unnecessary ports listening for connections."
+    severity: "high"
+    query: "SELECT DISTINCT port FROM listening_ports WHERE address = '0.0.0.0' AND port NOT IN (22, 80, 443, 5353, 39393);"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"

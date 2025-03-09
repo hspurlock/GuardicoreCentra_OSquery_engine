@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "CIS-W-5.1.1"
+    title: "Ensure 'Windows Firewall: Domain: Firewall state' is set to 'On'"
+    description: "Windows Firewall for the Domain profile must be enabled to protect the system from network-based attacks."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\WindowsFirewall\\DomainProfile\\EnableFirewall' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-5.1.2"
+    title: "Ensure 'Windows Firewall: Private: Firewall state' is set to 'On'"
+    description: "Windows Firewall for the Private profile must be enabled to protect the system from network-based attacks."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\WindowsFirewall\\PrivateProfile\\EnableFirewall' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-5.1.3"
+    title: "Ensure 'Windows Firewall: Public: Firewall state' is set to 'On'"
+    description: "Windows Firewall for the Public profile must be enabled to protect the system from network-based attacks."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\WindowsFirewall\\PublicProfile\\EnableFirewall' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-18.1.1"
+    title: "Ensure 'Prevent enabling lock screen camera' is set to 'Enabled'"
+    description: "Disabling the lock screen camera prevents users from taking pictures from the lock screen."
+    severity: "low"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\Personalization\\NoLockScreenCamera' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-18.1.2"
+    title: "Ensure 'Prevent enabling lock screen slide show' is set to 'Enabled'"
+    description: "Disabling the lock screen slide show prevents potentially sensitive information from being displayed on the lock screen."
+    severity: "low"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Policies\\Microsoft\\Windows\\Personalization\\NoLockScreenSlideshow' AND data = 1;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-18.2.1"
+    title: "Ensure LAPS AdmPwd GPO Extension / CSE is installed"
+    description: "Local Administrator Password Solution (LAPS) provides management of local account passwords of domain joined computers."
+    severity: "medium"
+    query: "SELECT name FROM programs WHERE name LIKE '%Local Administrator Password Solution%';"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-18.3.1"
+    title: "Ensure 'MSS: (AutoAdminLogon) Enable Automatic Logon (not recommended)' is set to 'Disabled'"
+    description: "This setting allows an administrator to configure a computer to automatically log on as a specific user."
+    severity: "high"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\AutoAdminLogon' AND (data = '0' OR data = '');"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-18.3.2"
+    title: "Ensure 'MSS: (DisableIPSourceRouting IPv6) IP source routing protection level' is set to 'Enabled: Highest protection'"
+    description: "IP source routing is a mechanism that allows the sender to determine the path that a packet should take through the network."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\Tcpip6\\Parameters\\DisableIPSourceRouting' AND data = 2;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-18.3.3"
+    title: "Ensure 'MSS: (DisableIPSourceRouting) IP source routing protection level' is set to 'Enabled: Highest protection'"
+    description: "IP source routing is a mechanism that allows the sender to determine the path that a packet should take through the network."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\Tcpip\\Parameters\\DisableIPSourceRouting' AND data = 2;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"
+
+  - id: "CIS-W-18.3.4"
+    title: "Ensure 'MSS: (EnableICMPRedirect) Allow ICMP redirects to override OSPF generated routes' is set to 'Disabled'"
+    description: "Internet Control Message Protocol (ICMP) redirects cause the IPv4 stack to plumb host routes."
+    severity: "medium"
+    query: "SELECT name, data FROM registry WHERE path = 'HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\Tcpip\\Parameters\\EnableICMPRedirect' AND data = 0;"
+    condition:
+      type: "not_equals"
+      field: "count"
+      value: "0"

@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "TH-LNX-001"
+    title: "Detect suspicious cron jobs"
+    description: "Identifies potentially malicious cron jobs that could be used for persistence"
+    severity: "high"
+    query: "SELECT c.command, c.path, u.username FROM crontab c JOIN users u ON c.uid = u.uid WHERE c.command LIKE '%nc %' OR c.command LIKE '%netcat%' OR c.command LIKE '%base64 -d%' OR c.command LIKE '%curl%|bash%' OR c.command LIKE '%wget%|bash%';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "TH-LNX-002"
+    title: "Detect suspicious startup items"
+    description: "Identifies potentially malicious startup scripts in systemd, init.d, or rc.local"
+    severity: "high"
+    query: "SELECT path, name, source FROM startup_items WHERE path LIKE '/etc/systemd/system/%' OR path LIKE '/etc/init.d/%' OR path LIKE '/etc/rc%.d/%' OR path = '/etc/rc.local';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-LNX-003"
+    title: "Detect unauthorized SSH keys"
+    description: "Identifies potentially unauthorized SSH keys in user home directories"
+    severity: "high"
+    query: "SELECT u.username, f.path, f.size, f.mtime FROM users u JOIN file f ON f.directory = u.directory || '/.ssh' WHERE f.filename = 'authorized_keys' OR f.filename = 'id_rsa' OR f.filename = 'id_dsa';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-LNX-004"
+    title: "Detect suspicious SUID/SGID binaries"
+    description: "Identifies potentially malicious SUID/SGID binaries that could be used for privilege escalation"
+    severity: "high"
+    query: "SELECT path, mode, size, uid, gid, mtime FROM file WHERE (mode LIKE '%S%' OR mode LIKE '%s%') AND path NOT IN ('/bin/su', '/bin/sudo', '/usr/bin/sudo', '/usr/bin/passwd', '/usr/bin/gpasswd', '/usr/bin/chsh', '/usr/bin/chfn', '/usr/bin/newgrp', '/bin/mount', '/bin/umount', '/usr/bin/crontab', '/usr/bin/pkexec', '/usr/bin/at', '/usr/bin/chage');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-LNX-005"
+    title: "Detect hidden files and directories"
+    description: "Identifies hidden files and directories in user home directories that could be used to hide malicious content"
+    severity: "medium"
+    query: "SELECT path, size, type, mtime FROM file WHERE path LIKE '/home/%/.%' AND path NOT LIKE '/home/%/.%/%' AND path NOT LIKE '/home/%/.bash%' AND path NOT LIKE '/home/%/.profile' AND path NOT LIKE '/home/%/.ssh%' AND path NOT LIKE '/home/%/.config%' AND path NOT LIKE '/home/%/.local%' AND path NOT LIKE '/home/%/.cache%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-LNX-006"
+    title: "Detect suspicious kernel modules"
+    description: "Identifies potentially malicious kernel modules that could be used for rootkits"
+    severity: "critical"
+    query: "SELECT name, size, used_by, status FROM kernel_modules WHERE status = 'active' AND used_by = '';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-LNX-007"
+    title: "Detect modified system binaries"
+    description: "Identifies potentially modified system binaries by checking their hash against known values"
+    severity: "critical"
+    query: "SELECT path, md5, sha256 FROM file WHERE path IN ('/bin/ls', '/bin/ps', '/bin/netstat', '/bin/ss', '/bin/ip', '/bin/find', '/bin/grep', '/bin/bash', '/bin/sh');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-LNX-008"
+    title: "Detect suspicious processes"
+    description: "Identifies potentially malicious processes with suspicious command lines"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, p.cmdline, p.uid, u.username FROM processes p JOIN users u ON p.uid = u.uid WHERE p.cmdline LIKE '%nc %' OR p.cmdline LIKE '%netcat%' OR p.cmdline LIKE '%base64 -d%' OR p.cmdline LIKE '%curl%|bash%' OR p.cmdline LIKE '%wget%|bash%' OR p.cmdline LIKE '%python%socket%' OR p.cmdline LIKE '%perl%socket%';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "TH-LNX-009"
+    title: "Detect suspicious network connections"
+    description: "Identifies potentially malicious network connections to unusual ports or addresses"
+    severity: "high"
+    query: "SELECT s.pid, p.name, p.path, p.cmdline, s.local_address, s.local_port, s.remote_address, s.remote_port, s.state FROM process_open_sockets s JOIN processes p ON s.pid = p.pid WHERE (s.remote_port = 4444 OR s.remote_port = 4545 OR s.remote_port = 1337 OR s.remote_port = 31337 OR s.remote_port = 666 OR s.remote_port = 6666 OR s.remote_port = 6667 OR s.remote_port = 6668 OR s.remote_port = 6669 OR s.remote_port = 9999) AND s.state = 'ESTABLISHED';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"
+
+  - id: "TH-LNX-010"
+    title: "Detect unauthorized users with UID 0"
+    description: "Identifies unauthorized users with root privileges (UID 0)"
+    severity: "critical"
+    query: "SELECT username, uid, gid, shell FROM users WHERE uid = 0 AND username != 'root';"
+    condition:
+      type: "equals"
+      field: "count"
+      value: "0"

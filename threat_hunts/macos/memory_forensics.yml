@@ -1,0 +1,101 @@
+---
+checks:
+  - id: "TH-MAC-MEM-001"
+    title: "Detect processes with unusual parent-child relationships"
+    description: "Identifies processes with unusual parent-child relationships that could indicate process injection or masquerading"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, pp.name AS parent_name, pp.path AS parent_path FROM processes p JOIN processes pp ON p.parent = pp.pid WHERE (p.name = 'bash' AND pp.name NOT IN ('Terminal', 'iTerm', 'login', 'sshd')) OR (p.name LIKE 'python%' AND pp.name NOT IN ('bash', 'sh', 'zsh'));"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-MEM-002"
+    title: "Detect processes with deleted executables"
+    description: "Identifies running processes whose executable files have been deleted"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, p.cmdline FROM processes p WHERE p.path NOT IN (SELECT path FROM file WHERE path = p.path);"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-MEM-003"
+    title: "Detect memory-resident malware"
+    description: "Identifies processes with suspicious memory-only execution patterns"
+    severity: "critical"
+    query: "SELECT p.pid, p.name, p.path, m.path AS mapped_path, m.permissions FROM processes p JOIN process_memory_map m ON p.pid = m.pid WHERE m.path = '' AND m.permissions LIKE '%rwx%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-MEM-004"
+    title: "Detect processes with excessive memory usage"
+    description: "Identifies processes with unusually high memory usage that could indicate memory dumping or crypto mining"
+    severity: "medium"
+    query: "SELECT pid, name, path, resident_size FROM processes WHERE resident_size > 1000000000 AND name NOT IN ('firefox', 'Google Chrome', 'Safari', 'java', 'mysqld', 'postgres');"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-MEM-005"
+    title: "Detect processes with suspicious memory mappings"
+    description: "Identifies processes with suspicious memory mappings that could indicate code injection"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, m.path AS mapped_path, m.permissions FROM processes p JOIN process_memory_map m ON p.pid = m.pid WHERE m.path LIKE '/tmp/%' OR m.path LIKE '/private/tmp/%' OR m.path LIKE '/private/var/tmp/%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-MEM-006"
+    title: "Detect processes with suspicious dylib injections"
+    description: "Identifies processes with suspicious dylib injections that could indicate malicious activity"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, m.path AS module_path FROM processes p JOIN process_memory_map m ON p.pid = m.pid WHERE m.path LIKE '/tmp/%.dylib' OR m.path LIKE '/private/tmp/%.dylib' OR m.path LIKE '/private/var/tmp/%.dylib';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-MEM-007"
+    title: "Detect processes with suspicious environment variables"
+    description: "Identifies processes with suspicious environment variables that could indicate malicious activity"
+    severity: "medium"
+    query: "SELECT p.pid, p.name, p.path, pe.key, pe.value FROM processes p JOIN process_envs pe ON p.pid = pe.pid WHERE pe.key IN ('DYLD_INSERT_LIBRARIES', 'DYLD_LIBRARY_PATH') AND pe.value NOT LIKE '/System/Library/%' AND pe.value NOT LIKE '/usr/lib/%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-MEM-008"
+    title: "Detect processes with suspicious open file descriptors"
+    description: "Identifies processes with suspicious open file descriptors that could indicate malicious activity"
+    severity: "medium"
+    query: "SELECT p.pid, p.name, p.path, pof.fd, pof.path FROM processes p JOIN process_open_files pof ON p.pid = pof.pid WHERE pof.path LIKE '/dev/mem' OR pof.path LIKE '/dev/kmem';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-MEM-009"
+    title: "Detect processes with suspicious memory permissions"
+    description: "Identifies processes with suspicious memory permissions that could indicate code injection"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path, m.path AS mapped_path, m.permissions FROM processes p JOIN process_memory_map m ON p.pid = m.pid WHERE m.path = '[heap]' AND m.permissions LIKE '%x%';"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
+
+  - id: "TH-MAC-MEM-010"
+    title: "Detect processes with suspicious syscall activity"
+    description: "Identifies processes with suspicious syscall activity that could indicate malicious behavior"
+    severity: "high"
+    query: "SELECT p.pid, p.name, p.path FROM processes p WHERE p.pid IN (SELECT pid FROM process_events WHERE syscall = 'ptrace' AND time > (SELECT unix_time FROM time) - 3600);"
+    condition:
+      type: "manual_review"
+      field: "all"
+      value: "N/A"
