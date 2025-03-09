@@ -180,6 +180,42 @@ To add support for a new operating system:
 2. Add YAML files with appropriate checks for that OS.
 3. The tool will automatically detect and use these checks when run on that OS.
 
+## Guardicore Centra Integration
+
+This application includes integration with Guardicore Centra for enhanced security monitoring and threat detection:
+
+### Guardicore Features
+
+- **Real-time Threat Detection**: Correlate osquery compliance data with Guardicore Centra's threat detection capabilities
+- **Network Visualization**: Map compliance issues to network segments and traffic flows
+- **Micro-Segmentation**: Use compliance data to inform micro-segmentation policies
+- **Incident Response**: Trigger automated responses based on compliance violations
+- **Unified Dashboard**: View compliance status alongside security incidents in a single interface
+
+### Using the Guardicore Integration
+
+```
+python osquery_compliance.py guardicore --connect
+```
+
+Connect to your Guardicore Centra instance:
+
+```
+python osquery_compliance.py guardicore --connect --api-key YOUR_API_KEY --server guardicore.example.com
+```
+
+Send compliance data to Guardicore:
+
+```
+python osquery_compliance.py run --export-guardicore
+```
+
+View compliance issues in Guardicore context:
+
+```
+python osquery_compliance.py guardicore --view-compliance
+```
+
 ## Future Development
 
 Planned enhancements for future releases:
@@ -190,6 +226,7 @@ Planned enhancements for future releases:
 - Integration with security information and event management (SIEM) systems
 - Web-based dashboard for visualizing compliance status
 - Expanded checks for additional operating systems
+- Enhanced Guardicore integration with bi-directional data flow
 
 ## Contributing
 
